@@ -7,20 +7,24 @@ import { Query } from 'appwrite';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
 
 async function listAll(collection_id, queries = []) {
-  const res = await databases.listDocuments(DBID, collection_id, [
-    ...queries,
-    Query.limit(5000),
-  ]);
-  return res.documents || [];
+  try {
+    const res = await databases.listDocuments(DBID, collection_id, [
+      ...queries,
+      Query.limit(5000),
+    ]);
+    return res.documents || [];
+  } catch {
+    return [];
+  }
 }
 
 export async function GET() {
   try {
     const [pkgDocs, catDocs, destDocs, blogDocs] = await Promise.all([
-      listAll(COLLECTIONS.PACKAGES,    [Query.equal('active', true)]),
-      listAll(COLLECTIONS.CATEGORIES,  [Query.equal('active', true)]),
-      listAll(COLLECTIONS.DESTINATIONS,[Query.equal('active', true)]),
-      listAll(COLLECTIONS.BLOGS,       [Query.equal('active', true)]),
+      listAll(COLLECTIONS.PACKAGES,     [Query.equal('active', true)]),
+      listAll(COLLECTIONS.CATEGORIES),
+      listAll(COLLECTIONS.DESTINATIONS),
+      listAll(COLLECTIONS.BLOGS,        [Query.equal('active', true)]),
     ]);
 
     const packages     = pkgDocs.map(p  => ({ url: `${SITE_URL}/packages/${p.url}`,     lastmod: p.$updatedAt, changefreq: 'weekly',  priority: 0.8 }));
@@ -56,7 +60,7 @@ ${allUrls
     });
   } catch (error) {
     console.error('Sitemap error:', error);
-    return new NextResponse(`<?xml version="1.0" encoding="UTF-8"?><error>${error?.message || String(error)}</error>`, {
+    return new NextResponse('<?xml version="1.0" encoding="UTF-8"?><error>Sitemap error</error>', {
       status: 500,
       headers: { 'Content-Type': 'application/xml' },
     });
