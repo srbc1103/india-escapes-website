@@ -56,7 +56,7 @@ ${allUrls
     });
   } catch (error) {
     console.error('Sitemap error:', error);
-    return new NextResponse('<?xml version="1.0" encoding="UTF-8"?><error>Sitemap error</error>', {
+    return new NextResponse(`<?xml version="1.0" encoding="UTF-8"?><error>${error?.message || String(error)}</error>`, {
       status: 500,
       headers: { 'Content-Type': 'application/xml' },
     });
