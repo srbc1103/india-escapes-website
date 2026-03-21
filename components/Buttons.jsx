@@ -1,0 +1,51 @@
+'use client'
+import { toast } from "sonner"
+import { cn } from "../lib/utils"
+import { useTranslation } from "../hooks/useTranslation"
+
+export default function Button(props) {
+  const {styles,children} = props
+  return (
+    <button className={cn(`text-white transition duration-300 bg-black rounded-lg p-2 px-4 hover:brightness-105 disabled:pointer-events-none disabled:opacity-10`,styles)} {...props}>{children}</button>
+  )
+}
+
+export function RoundButton(props){
+    const {styles,children} = props
+    return(<button className={cn(`bg-white rounded-full overflow-hidden flex-center-jc shadow aspect-square transition duration-300 disabled:pointer-events-none disabled:opacity-50 cursor-pointer hover:shadow-lg`,styles)} {...props}>{children}</button>)
+}
+
+export function ShareButton({ title, url, text, button_text, styles, button_styles }) {
+  const { t } = useTranslation();
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: title,
+          text: text || `Check out this amazing trip: ${title} on India Escapes`,
+          url: url,
+        });
+      } catch (err) {
+        console.log('Share cancelled or failed', err);
+      }
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(url);
+      toast.success("Link copied to clipboard!");
+    }
+  };
+
+  return (
+    <Button
+      onClick={handleShare}
+      styles={cn(`flex-center-jc gap-2 bg-gray-100/50 border border-gray-300 text-black  transition-all duration-300 px-6 py-3 rounded-full text-sm lg:text-base font-medium whitespace-nowrap`,styles)}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 md:h-5 md:w-5" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+      </svg>
+      {button_text ? <p className={cn(button_styles)}>{button_text || ""}</p> : <></>}
+      
+    </Button>
+  );
+}

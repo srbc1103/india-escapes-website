@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install @tanstack/react-query)",
+      "Bash(npm run build)",
+      "Bash(python3 -c \":*)",
+      "Bash(pip install:*)",
+      "Bash(pip3 install:*)",
+      "Bash(node -e \":*)",
+      "Bash(unzip -o sitemap_correction.xlsx -d /tmp/xlsx_extract)",
+      "Read(//tmp/xlsx_extract/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
