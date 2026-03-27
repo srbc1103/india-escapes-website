@@ -8,6 +8,7 @@ import { QueryProvider } from "../providers/QueryProvider";
 import { Toaster } from "../components/ui/sonner";
 import { LanguageProvider } from "../context/LanguageContext";
 import { CurrencyProvider } from "../context/CurrencyContext";
+import GoogleTranslate from "../components/GoogleTranslate";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -31,6 +32,7 @@ export default function RootLayout({ children }) {
         <Toaster />
         <QueryProvider>
           <LanguageProvider>
+            <GoogleTranslate />
             <CurrencyProvider>
               <ThemeProvider
                 attribute="class"
