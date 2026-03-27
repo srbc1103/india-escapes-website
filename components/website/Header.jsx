@@ -479,8 +479,8 @@ function MobileMenuDrawer({ colorConfig, isDesktop, scrolled, isFixed, toggleMen
               <Globe size={14} />
               <span>{currentLanguage.code.toUpperCase()}</span>
             </PopoverTrigger>
-            <PopoverContent className="w-40 p-2">
-              <div className="flex flex-col gap-1">
+            <PopoverContent className="w-40 p-2 z-[200]">
+              <div className="flex flex-col gap-1 max-h-[300px] overflow-y-auto">
                 {LANGUAGES.map((lang, i) => {
                   const isSelected = lang.code === language;
                   return (
@@ -506,8 +506,8 @@ function MobileMenuDrawer({ colorConfig, isDesktop, scrolled, isFixed, toggleMen
               <DollarSign size={14} />
               <span>{currentCurrency.code}</span>
             </PopoverTrigger>
-            <PopoverContent className="w-44 p-2">
-              <div className="flex flex-col gap-1">
+            <PopoverContent className="w-44 p-2 z-[200]">
+              <div className="flex flex-col gap-1 max-h-[300px] overflow-y-auto">
                 {CURRENCIES.map((curr, i) => {
                   const isSelected = curr.code === currency;
                   return (
