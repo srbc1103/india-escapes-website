@@ -120,21 +120,16 @@ export default function Page() {
     {title:t('home.localExpertise'),text:t('home.localExpertiseText'),icon: <Award size={28}/>}
   ]
 
-  // useEffect(()=>{
-  //   loadStats()
-  // },[])
 
   return (
     <>
       <Header color={{mobile:'white',desktop:'white'}} fixed/>
-      {/* header section */}
       <div className="h-[75vh] max-w-[100vw] lg:h-[90vh] relative flex-center-jc flex-col gap-8 overflow-hidden bg-black">
         <video autoPlay muted loop playsInline preload="auto" poster="/poster.webp" className="absolute top-0 h-full lg:-top-[25%] lg:h-[125%] w-full left-0 object-cover opacity-80" style={{zIndex:0}}>
-          <source src="/vdo.webm" type="video/webm" />
           <source src="/vdo.mp4" type="video/mp4" />
+          <source src="/vdo.webm" type="video/webm" />
         </video>
-        {/* <Image src={IMAGES.white_strip} height={500} width={500} className="absolute -bottom-1 lg:-bottom-4 h-auto w-full left-0 object-contain" style={{zIndex:0}} alt=""/> */}
-        {/* <Image src={IMAGES.hero_bg} height={500} width={500} className="absolute top-0 h-full w-full left-0 object-cover" style={{zIndex:0}} alt=""/> */}
+        
         <h1 className="w_80_90 text-center text-white text-2xl md:text-3xl relative lg:text-5xl mt-12" style={{lineHeight:'130%'}}>
           Your dream Indian escape, personally designed with expert local insight
         </h1>
