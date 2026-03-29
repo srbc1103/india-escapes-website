@@ -13,7 +13,7 @@ import Data from "../../../../lib/backend"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { use, useEffect, useState } from "react"
-import { PackagesSection } from "../../destinations/[url]/page"
+import { PackagesSection } from "../../destinations/[url]/DestinationClient"
 
 
 export default function Destination({params}) {
