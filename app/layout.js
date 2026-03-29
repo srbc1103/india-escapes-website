@@ -16,8 +16,8 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  title: "India Escapes",
-  description: "India Escapes | Your Trusted Travel Partner",
+  title: "Exotic India Travel Packages & Tailor-Made Tours | India Escapes",
+  description: "Discover exotic India escapes with tailor-made travel packages designed by local experts. Personalized itineraries, authentic experiences & seamless journeys. Get your free quote today!",
 };
 
 export default function RootLayout({ children }) {

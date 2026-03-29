@@ -97,13 +97,12 @@ export default function CATEGORIES() {
     });
   };
 
-  const renderEditLocationForm = ({ name, id, description, images }) => {
+  const renderEditLocationForm = (data) => {
     setEditForm(
         <LocationForm
-          name={name}
-          id={id}
-          description={description}
-          images={images||[]}
+          // name={name}
+          // id={id}
+          {...data}
           mode="update"
           type="category"
           onSave={() => {
@@ -205,7 +204,7 @@ export default function CATEGORIES() {
                             className="p-2 flex gap-2 items-center justify-start disabled:pointer-events-none disabled:opacity-60 border-b border-gray-200/50 transition duration-300 hover:bg-green/5 w-full"
                             role="button"
                             onClick={() => {
-                              renderEditLocationForm({ name: item.name, id: item.id, description: item.description, images: item.images })
+                              renderEditLocationForm(item)
                             }}
                             disabled={updating}
                           >

@@ -190,14 +190,14 @@ export function QueryForm(props){
 }
 
 export function LocationForm(props){
-    const {onSave,mode,id,name,description,images,type} = props
+    const {onSave,mode,id,name,description,images,type,page_heading='',meta_title='',meta_description='',meta_keywords=''} = props
     const [saving,setSaving] = useState(false)
     const [disabled,setDisabled] = useState(true)
     const [region,setRegion] = useState(props.region || '')
     const [state,setState] = useState({
         name,
         description,
-        images : images || [],
+        images : images || [],page_heading,meta_title,meta_description,meta_keywords
     })
     const { showDialog: showMediaSelector, hideDialog: hideMediaSelector, dialog: mediaSelector } = usePopup({
         form: (
@@ -229,14 +229,20 @@ export function LocationForm(props){
     const handleSubmit = async(e)=>{
         e.preventDefault()
         if(disabled) return
-        let {name} = state
-        let item_data = {...state}
+        let {name,page_heading,meta_title,meta_description,meta_keywords,images,description} = state
+        let item_data = {name,description,images}
         item_data.url = slugify(name)
         if(type == 'destination' && region){
             item_data.region = region
         }
         if(type == 'category' && state.images.length > 0){
             item_data.featured_image = state.images[0]
+        }
+        if(type == 'destination' || type == 'category') {
+            item_data.page_heading = page_heading
+            item_data.meta_title = meta_title
+            item_data.meta_description = meta_description
+            item_data.meta_keywords = meta_keywords
         }
         setSaving(true)
         mode == 'create' ? 
@@ -287,10 +293,10 @@ export function LocationForm(props){
         <div className="w-full py-8 max-h-[85vh] overflow-y-auto">
             <p className="w-[80%] mx-auto font-medium text-lg md:text-xl gradient_text pb-2 mb-8 border-b text-center border-b-gray-300">{mode == 'edit' ? 'Edit' : 'Add'} {type == 'location' ? 'Sightseeing' : type}</p>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full items-center p-4">
-                <div className="flex flex-wrap items-center justify-center gap-2 h-full px-4">
+                <div className="flex flex-wrap items-start justify-center gap-2 h-full px-4">
                     {state.images.map((image,ind)=>{
                         return <div key={ind} className="h-24 w-24 overflow-hidden rounded-lg relative">
-                            <img src={image} alt={state.name} className="h-full w-full object-cover"/>
+                            <img src={image?.replace('&mode=admin','')} alt={state.name} className="h-full w-full object-cover"/>
                             {!saving && <RoundButton onClick={()=>{
                                 let images = state.images
                                 images = images.filter(e=>e !== image)
@@ -307,7 +313,14 @@ export function LocationForm(props){
                     <div className="grid grid-cols-1 gap-4 w-[90%] mx-auto lg:mx-0 mb-8">
                         <Input label={`${type} Name`} value={state.name} onChange={(e)=>setState(state=>({...state,name:e.target.value}))} placeholder={`${type} name`}/>
                         {type == 'destination' ? <SelectInput1 label={`Region`} value={region} fun={(e)=>setRegion(e)} placeholder={`Select Region`} options={REGIONS}/> : <></>}
+                        
                         <TextArea rows={2} label="Description" value={state.description} onChange={(e)=>setState(state=>({...state,description:e.target.value}))} placeholder="Description"/>
+                        {type == 'destination' || type == 'category' ? <>
+                            <Input label={`Page Heading`} value={state.page_heading} onChange={(e)=>setState(state=>({...state,page_heading:e.target.value}))} placeholder={`Page Heading`}/>
+                            <Input label={`Meta Title`} value={state.meta_title} onChange={(e)=>setState(state=>({...state,meta_title:e.target.value}))} placeholder={`Meta Title`}/>
+                            <TextArea rows={2} label="Meta Description" value={state.meta_description} onChange={(e)=>setState(state=>({...state,meta_description:e.target.value}))} placeholder="Meta Description"/>
+                            <TextArea rows={2} label="Meta Keywords" value={state.meta_keywords} onChange={(e)=>setState(state=>({...state,meta_keywords:e.target.value}))} placeholder="Meta Keywords"/>
+                        </> : <></>}
                     </div>
                     <div className="flex-center-jc gap-2 ">
                         {mode == 'update' ? <Button onClick={handleDelete} disabled={saving} styles="px-4 py-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white flex items-center gap-2 justify-center" > <Trash size={18} /> Delete </Button> : <></>}
