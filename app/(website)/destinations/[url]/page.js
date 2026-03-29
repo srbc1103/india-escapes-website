@@ -18,6 +18,7 @@ import { use, useEffect, useState } from "react"
 import { Swiper, SwiperSlide } from 'swiper/react'
 import {  Autoplay } from 'swiper/modules'
 import { ShareButton } from "../../../../components/Buttons"
+import { setMetaTags } from "../../../../functions"
 
 export default function Destination({params}) {
     const {url} = use(params)
@@ -32,16 +33,17 @@ export default function Destination({params}) {
       });
 
     const [state, setState] = useState({
-        name: '', description:'', images:[], locations:[], full_detail:'', featured_image:'',location_metadata:null
+        name: '', description:'', images:[], locations:[], full_detail:'', featured_image:'',location_metadata:null, meta_title: '', meta_description: '', meta_keywords: '', page_heading: ''
     })
     
     useEffect(()=>{
         if(destination_detail){
-            let { name, images, location_metadata, full_detail, featured_image, description, id, region } = destination_detail
-            setState(s=>({...s,name,description,images:images||[],full_detail,featured_image,location_metadata:JSON.parse(location_metadata) || []}))
+            let { name, images, location_metadata, full_detail, featured_image, description, id, region, meta_title, meta_description, meta_keywords, page_heading } = destination_detail
+            setState(s=>({...s,name,description,images:images||[],full_detail,featured_image,location_metadata:JSON.parse(location_metadata) || [], page_heading: page_heading || name || ''}))
+            setMetaTags({meta_title: meta_title || page_heading || name, meta_description: meta_description || description, meta_keywords: meta_keywords || '',title: meta_title || page_heading || name})
             setBreadCrumb(region,name)
             setDestinationID(id)
-            document.title = name
+            // document.title = name
         }
     },[destination_detail])
 
@@ -141,14 +143,14 @@ export default function Destination({params}) {
                 >
                     {state.images.map((img, index) => {
                     return <SwiperSlide key={index} className={`w-full  h-full`}>
-                        <Image src={img} alt={state.name} height={1000} width={1000} className='w-full h-full object-cover opacity-80'/>
+                        <Image src={img} alt={state.page_heading || state.name} height={1000} width={1000} className='w-full h-full object-cover opacity-80'/>
                     </SwiperSlide>
                     })}
                 </Swiper>
                 </>: <div className="h-[32vh] lg:h-[65vh] flex-center-jc relative bg-black">
                 {state.featured_image ? <Image src={state.featured_image} height={500} width={500} className="absolute top-0 h-full w-full left-0 object-cover opacity-90" style={{zIndex:0}} alt=""/> : <div className="w_80_90 relative">
-                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold mb-2 lg:mb-4 pt-20 lg:pt-12">{state.name}</h1>
-                    <p className="text-xs md:text-sm lg:text-lg">{state.description}</p>
+                    <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold mb-2 lg:mb-4 pt-20 lg:pt-12">{state.page_heading || state.name}</h1>
+                    <p className="text-xs md:text-sm lg:text-lg">{state.meta_description || state.description}</p>
                 </div>}
                 <div className="bg-gradient-to-t from-white to-transparent h-[50%] w-full absolute bottom-0 left-0"/>
                 
@@ -158,7 +160,7 @@ export default function Destination({params}) {
                 <ShareButton title={state.name} url={typeof window !== 'undefined' ? window.location.href : ''} text={`Check out this amazing ${state.name} travel destination on India Escapes. ${state.description}`} button_text="Share" styles="text-xs lg:text-sm p-2 lg:px-4" button_styles="hidden md:block"/>
             </div>
             {((state.images && state.images.length > 0) || state.featured_image) ? <div className="w_80_90 py-4 md:py-8 space-y-2 md:space-y-4">
-                <h1 className="text-2xl md:text-3xl lg:text-5xl font-bold text-red">{state.name}</h1>
+                <h1 className="text-2xl md:text-3xl lg:text-5xl font-bold text-red">{state.page_heading || state.name}</h1>
                 <p className="text-xs md:text-lg text-gray-600 max-w-2xl">{state.description}</p>
             </div> : <></>}
             <PackagesSection destination_id={destinationID}/>

@@ -111,6 +111,56 @@ export function formatNumber(num, currencyCode = 'INR', exchangeRates = null) {
   return `${symbol}${formatted}`;
 }
 
+export function setMetaTags({
+  title,
+  meta_title,
+  meta_description,
+  meta_keywords
+} = {}) {
+
+  if (title) {
+    document.title = title;
+  }
+
+  if (meta_title) {
+    let ogTitle = document.querySelector("meta[property='og:title']");
+    if (!ogTitle) {
+      ogTitle = document.createElement('meta');
+      ogTitle.setAttribute('property', 'og:title');
+      document.head.appendChild(ogTitle);
+    }
+    ogTitle.setAttribute('content', meta_title);
+  }
+
+  if (meta_description) {
+    let description = document.querySelector("meta[name='description']");
+    if (!description) {
+      description = document.createElement('meta');
+      description.setAttribute('name', 'description');
+      document.head.appendChild(description);
+    }
+    description.setAttribute('content', meta_description);
+
+    let ogDescription = document.querySelector("meta[property='og:description']");
+    if (!ogDescription) {
+      ogDescription = document.createElement('meta');
+      ogDescription.setAttribute('property', 'og:description');
+      document.head.appendChild(ogDescription);
+    }
+    ogDescription.setAttribute('content', meta_description);
+  }
+
+  if (meta_keywords) {
+    let keywords = document.querySelector("meta[name='keywords']");
+    if (!keywords) {
+      keywords = document.createElement('meta');
+      keywords.setAttribute('name', 'keywords');
+      document.head.appendChild(keywords);
+    }
+    keywords.setAttribute('content', meta_keywords);
+  }
+}
+
 export function formatNumber1(num) {
     if (num == null || num === '') return '0';
 

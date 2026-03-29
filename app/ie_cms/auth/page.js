@@ -6,6 +6,8 @@ import Data from '../../../lib/backend'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import Cookies from 'js-cookie'
+import { HASH } from '../../../constants'
 
 export default function Page() {
   const router = useRouter()

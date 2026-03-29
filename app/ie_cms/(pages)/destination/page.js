@@ -10,7 +10,7 @@ import { useCUD } from "../../../../hooks/useCUD"
 import { useFetchList } from "../../../../hooks/useFetch"
 import usePopup from "../../../../hooks/usePopup"
 import Data from "../../../../lib/backend"
-import { CircleCheckBig, ImagePlus, Images, Pencil, Plus, Save, Trash, X } from "lucide-react"
+import { ArrowLeft, CircleCheckBig, ImagePlus, Images, Pencil, Plus, Save, Trash, X } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState, Suspense } from "react"
 import { toast } from "sonner"
@@ -37,7 +37,7 @@ function DestinationPageContent() {
     })
 
     const [state, setState] = useState({
-        name: '', description:'', images:[], locations:[], full_detail:'', featured_image:'', region:''
+        name: '', description:'', images:[], locations:[], full_detail:'', featured_image:'', region:'',page_heading:'',meta_title:'',meta_description:'',meta_keywords:''
     })
 
 
@@ -55,8 +55,8 @@ function DestinationPageContent() {
         Data.get_item_detail({ collection_id: COLLECTIONS.DESTINATIONS, document_id: did }).then(d => {
             const { status, message } = d
             if (status == 'success') {
-                let { name, images, locations, full_detail, featured_image, description, region } = d.document
-                setState(s => ({ ...s, name, images,  locations, full_detail, featured_image, description, region }))
+                let { name, images, locations, full_detail, featured_image, description, region,page_heading='',meta_title='',meta_description='',meta_keywords=''   } = d.document
+                setState(s => ({ ...s, name, images,  locations, full_detail, featured_image, description, region,page_heading,meta_title,meta_description,meta_keywords }))
                 document.title = name
             } else {
                 toast.error(message)
@@ -204,6 +204,7 @@ function DestinationPageContent() {
                 </div>
             ) : (
                 <>
+                    <RoundButton styles="p-2 text-xs font-medium bg-gray-200 mb-4" title="Close" onClick={()=>router.back()}><ArrowLeft size={16}/></RoundButton>
                     <PageHead text={state.name || 'Destination Detail'} styles="font-medium" />
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 my-4">
                     {/* main section */}
@@ -298,13 +299,41 @@ function DestinationPageContent() {
                                     )}
                                 </div>
                             </div>
+                            <Input
+                                label="Page Heading"
+                                value={state.page_heading || ''}
+                                onChange={(e) => setState(state => ({ ...state, page_heading: e.target.value }))}
+                                placeholder="Page Heading"
+                            />
+                            <Input
+                                label="Meta Title"
+                                value={state.meta_title || ''}
+                                onChange={(e) => setState(state => ({ ...state, meta_title: e.target.value }))}
+                                placeholder="Meta Title"
+                            />
                             <TextArea
                                 rows={3}
-                                label="Description"
-                                value={state.description}
-                                onChange={(e) => setState(state => ({ ...state, description: e.target.value }))}
-                                placeholder="Description"
+                                label="Meta Description"
+                                value={state.meta_description}
+                                onChange={(e) => setState(state => ({ ...state, meta_description: e.target.value }))}
+                                placeholder="Meta Description"
                             />
+                            <TextArea
+                                rows={3}
+                                label="Meta Keywords"
+                                value={state.meta_keywords}
+                                onChange={(e) => setState(state => ({ ...state, meta_keywords: e.target.value }))}
+                                placeholder="Meta Keywords"
+                            />
+                             <div className="md:col-span-2">
+                                <TextArea
+                                    rows={3}
+                                    label="Description"
+                                    value={state.description}
+                                    onChange={(e) => setState(state => ({ ...state, description: e.target.value }))}
+                                    placeholder="Description"
+                                />
+                            </div>
                             <div className="md:col-span-2 input_grp mt-4">
                                 <label className="text-xs ml-1 block mb-1">More Detail about {state.name || 'Destination'}</label>
                                 <TextEditor value={state.full_detail} onChange={val => setState(s => ({ ...s, full_detail: val }))} />
