@@ -10,7 +10,7 @@ import Image from 'next/image';
 import Heading from '../../../components/ui/Heading';
 import { Skeleton } from '../../../components/ui/skeleton';
 import { PackageBlockSkeleton } from '../../../components/PackageBlock';
-import { PackagesSection } from '../destinations/[url]/page';
+import { PackagesSection } from '../destinations/[url]/DestinationClient';
 
 /* ------------------------------------------------------------------ */
 /*  Skeleton shown while Suspense resolves (client hydration)         */

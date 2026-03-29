@@ -8,7 +8,8 @@
       "Bash(pip3 install:*)",
       "Bash(node -e \":*)",
       "Bash(unzip -o sitemap_correction.xlsx -d /tmp/xlsx_extract)",
-      "Read(//tmp/xlsx_extract/**)"
+      "Read(//tmp/xlsx_extract/**)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []
