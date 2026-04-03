@@ -32,13 +32,18 @@ export default function DestinationClient({params}) {
       });
 
     const [state, setState] = useState({
-        name: '', description:'', images:[], locations:[], full_detail:'', featured_image:'',location_metadata:null, meta_title: '', meta_description: '', meta_keywords: '', page_heading: ''
+        name: '', description:'', images:[], locations:[], full_detail:'', featured_image:'',location_metadata:[], meta_title: '', meta_description: '', meta_keywords: '', page_heading: ''
     })
 
     useEffect(()=>{
         if(destination_detail){
             let { name, images, location_metadata, full_detail, featured_image, description, id, region, meta_title, meta_description, meta_keywords, page_heading } = destination_detail
-            setState(s=>({...s,name,description,images:images||[],full_detail,featured_image,location_metadata:JSON.parse(location_metadata) || [], page_heading: page_heading || name || ''}))
+            let parsed_metadata = [];
+            try {
+              const p = location_metadata ? JSON.parse(location_metadata) : [];
+              parsed_metadata = Array.isArray(p) ? p : [];
+            } catch(_) {}
+            setState(s=>({...s,name,description,images:images||[],full_detail,featured_image,location_metadata:parsed_metadata, page_heading: page_heading || name || ''}))
             setBreadCrumb(region,name)
             setDestinationID(id)
         }
@@ -147,7 +152,7 @@ export default function DestinationClient({params}) {
                 <p className="text-xs md:text-lg text-gray-600 max-w-2xl">{state.description}</p>
             </div> : <></>}
             <PackagesSection destination_id={destinationID}/>
-            {state.location_metadata ? <div className="w_80_90 pt-12 lg:py-20">
+            {state.location_metadata.length > 0 ? <div className="w_80_90 pt-12 lg:py-20">
                 <Heading styles="mb-4 lg:text-3xl" text={state.name} span_text="tourist attractions"/>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 lg:gap-3">
                     {state.location_metadata.map((location,i)=>{
@@ -202,8 +207,8 @@ export function PackagesSection(props){
     ]
 
     const [filters, setFilters] = useState({
-        duration_option: null,
-        price_option: null
+        duration_option: '',
+        price_option: ''
     })
 
     const [state,setState] = useState({
@@ -273,7 +278,7 @@ export function PackagesSection(props){
 
     }
     return(<>
-        <div className="w_80_90 mt-4">
+        <div className="w_80_90 my-4 mb-8">
             {(loadingPackages || hide_filter) ? <></> : <div className="flex items-center justify-start gap-2">
                 <Select input_styles="border rounded-full text-red border-red p-1 px-3 text-xs min-h-0 cursor-pointer hover:bg-red/5" label="" options={price_options} value={filters.price_option} onChange={e=>{
                     setFilters(s=>({...s,price_option:e.target.value}))

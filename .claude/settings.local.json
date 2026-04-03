@@ -9,7 +9,8 @@
       "Bash(node -e \":*)",
       "Bash(unzip -o sitemap_correction.xlsx -d /tmp/xlsx_extract)",
       "Read(//tmp/xlsx_extract/**)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(npm run:*)"
     ],
     "deny": [],
     "ask": []
