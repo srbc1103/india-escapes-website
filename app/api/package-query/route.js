@@ -3,6 +3,43 @@ import { account, databases, storage } from "../../../lib/appwrite";
 import { COLLECTIONS, DBID, HASH, LIST_LIMIT, REGIONS } from "../../../constants";
 import { ID, Query } from "appwrite";
 
+// ── Server-side in-memory cache ──────────────────────────────────────────────
+// Shared across all requests in the same Node.js process. Dramatically reduces
+// Appwrite calls for data that rarely changes (categories, regions, deals, etc.).
+const _SC = new Map();
+
+function _scGet(key) {
+  const e = _SC.get(key);
+  if (!e || Date.now() > e.exp) { _SC.delete(key); return null; }
+  return e.data;
+}
+
+function _scSet(key, data, ttlMs) {
+  _SC.set(key, { data, exp: Date.now() + ttlMs });
+}
+
+function _scTTL(collection_id) {
+  switch (collection_id) {
+    case COLLECTIONS.CATEGORIES:
+    case COLLECTIONS.DESTINATIONS:
+    case COLLECTIONS.FAQ:
+    case COLLECTIONS.SETTINGS:
+      return 60 * 60 * 1000;  // 1 hour — almost never changes
+    case COLLECTIONS.BLOGS:
+    case COLLECTIONS.LOCATIONS:
+    case COLLECTIONS.ACTIVITIES:
+    case COLLECTIONS.ACCOMMODATIONS:
+      return 10 * 60 * 1000; // 10 min
+    case COLLECTIONS.DEALS:
+    case COLLECTIONS.LABELS:
+    case COLLECTIONS.PACKAGES:
+      return 3 * 60 * 1000;  // 3 min
+    default:
+      return 60 * 1000;      // 1 min
+  }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 // Cache duration helper - returns appropriate cache headers based on endpoint
 function getCacheHeaders(ep) {
   const cacheConfigs = {
@@ -219,6 +256,10 @@ async function fetchPackages(payload = {}) {
 }
 
 async function fetchPackagesForDeals(deals = []) {
+  const cacheKey = `deals-pkgs:${deals.map(d => d.name || '').sort().join('|')}`;
+  const cached = _scGet(cacheKey);
+  if (cached) return cached;
+
   const data = { items: [], status: "", message: "" };
 
   try {
@@ -316,6 +357,7 @@ async function fetchPackagesForDeals(deals = []) {
     });
 
     data.status = "success";
+    _scSet(cacheKey, data, 3 * 60 * 1000);
   } catch (error) {
     data.status = "error";
     data.message = error.message || "Failed to fetch packages for deals";
@@ -325,6 +367,10 @@ async function fetchPackagesForDeals(deals = []) {
 }
 
 async function fetchPackagesForLabels(labels = []) {
+  const cacheKey = `labels-pkgs:${labels.map(l => l.name || '').sort().join('|')}`;
+  const cached = _scGet(cacheKey);
+  if (cached) return cached;
+
   const data = { items: [], status: "", message: "" };
 
   try {
@@ -392,6 +438,7 @@ async function fetchPackagesForLabels(labels = []) {
     }));
 
     data.status = "success";
+    _scSet(cacheKey, data, 3 * 60 * 1000);
   } catch (error) {
     data.status = "error";
     data.message = error.message || "Failed to fetch packages for labels";
@@ -409,6 +456,14 @@ async function fetchItemsList({
   sort = "desc",
   search_query = null,
 }) {
+  // Only cache simple, unfiltered list requests
+  const canCache = !db_id && !queries.length && !search_query;
+  const cacheKey = `list:${collection_id}:${limit}:${offset}:${sort}`;
+  if (canCache) {
+    const cached = _scGet(cacheKey);
+    if (cached) return cached;
+  }
+
   let data = { items: [], total: 0, status: "", message: "" };
   const dbid = db_id || DBID;
   try {
@@ -440,6 +495,8 @@ async function fetchItemsList({
     data.total = response.total;
     data.items = items;
     data.status = "success";
+
+    if (canCache) _scSet(cacheKey, data, _scTTL(collection_id));
   } catch (error) {
     data.status = "error";
     data.message = error.message;
@@ -447,125 +504,58 @@ async function fetchItemsList({
   return data;
 }
 
-async function fetchRelatedPackages({ packageID, category = [], limit = 2 }) {
+// Accepts optional packageDoc to avoid an extra getDocument round-trip when
+// called from fetchPackageComplete (which already has the package data).
+async function fetchRelatedPackages({ packageID, packageDoc = null, category = [], limit = 3 }) {
   const data = { packages: [], status: "", message: "" };
   try {
-    const curPkgResp = await databases.getDocument(
-      DBID,
-      COLLECTIONS.PACKAGES,
-      packageID
-    );
-    if (!curPkgResp.active) {
-      data.status = "success";
-      data.packages = [];
-      return data;
+    // Reuse already-fetched package doc when available
+    let curPkg = packageDoc;
+    if (!curPkg) {
+      const resp = await databases.getDocument(DBID, COLLECTIONS.PACKAGES, packageID);
+      if (!resp.active) { data.status = "success"; return data; }
+      curPkg = resp;
     }
-    const curPrice = parseFloat(curPkgResp.price) || 0;
-    const curTags = curPkgResp.tags || "";
-    const priceMin = curPrice * 0.7;
-    const priceMax = curPrice * 1.3;
+
+    const curCategories = Array.isArray(curPkg.categories) ? curPkg.categories
+      : (Array.isArray(category) ? category : []);
+    const tagList = (curPkg.tags || "").split(",").map(t => t.trim()).filter(Boolean);
     const candidates = new Map();
 
-    // Category matches
-    if (Array.isArray(category) && category.length) {
-      const catQueries = category.map((c) => Query.contains("categories", c));
-      const catResp = await databases.listDocuments(DBID, COLLECTIONS.PACKAGES, [
-        Query.or(catQueries),
-        Query.notEqual("$id", packageID),
-        Query.equal("active", true),
-      ]);
-      catResp.documents.forEach((d) => {
-        const id = d.$id;
-        const score = (candidates.get(id)?.score || 0) + 50;
-        candidates.set(id, { score, pkg: d });
-      });
-    }
-
-    // Tag matches
-    const tagList = (curTags || "")
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean);
-    if (tagList.length) {
-      const tagQueries = tagList.map((t) => Query.contains("tags", t));
-      const tagResp = await databases.listDocuments(DBID, COLLECTIONS.PACKAGES, [
-        Query.or(tagQueries),
-        Query.notEqual("$id", packageID),
-        Query.equal("active", true),
-      ]);
-      tagResp.documents.forEach((d) => {
-        const id = d.$id;
-        const score = (candidates.get(id)?.score || 0) + 30;
-        candidates.set(id, { score, pkg: d });
-      });
-    }
-
-    // Itinerary metadata matches
-    const itineraryResp = await databases.listDocuments(
-      DBID,
-      COLLECTIONS.ITINERARY,
-      [Query.equal("package_id", packageID)]
-    );
-    const metaIds = { location: [], activity: [], accommodation: [] };
-    if (itineraryResp.documents?.length) {
-      itineraryResp.documents.forEach((doc) => {
-        const days = doc.days || [];
-        days.forEach((dayJson) => {
-          try {
-            const day = JSON.parse(dayJson);
-            (day.locations || []).forEach((id) => metaIds.location.push(id));
-            (day.activities || []).forEach((id) => metaIds.activity.push(id));
-            (day.accommodations || []).forEach(
-              (id) => metaIds.accommodation.push(id)
-            );
-          } catch (_) {}
-        });
-      });
-    }
-
-    const addMetaScore = async (field, weight) => {
-      if (!metaIds[field]?.length) return;
-      const uniq = [...new Set(metaIds[field])];
-      const queries = uniq.map((id) => Query.contains(field, id));
-      const resp = await databases.listDocuments(DBID, COLLECTIONS.PACKAGES, [
-        Query.or(queries),
-        Query.equal("active", true),
-      ]);
-      resp.documents.forEach((d) => {
-        const id = d.$id;
-        const score = (candidates.get(id)?.score || 0) + weight;
-        candidates.set(id, { score, pkg: d });
-      });
-    };
-    await addMetaScore("locations", 50);
-    await addMetaScore("activities", 15);
-    await addMetaScore("accommodations", 10);
-
-    // Price range matches
-    const priceResp = await databases.listDocuments(DBID, COLLECTIONS.PACKAGES, [
-      Query.greaterThanEqual("price", priceMin),
-      Query.lessThanEqual("price", priceMax),
-      Query.notEqual("$id", packageID),
-      Query.equal("active", true),
+    // Run category + tag queries in parallel — 2 calls instead of 8
+    const [catResp, tagResp] = await Promise.all([
+      curCategories.length
+        ? databases.listDocuments(DBID, COLLECTIONS.PACKAGES, [
+            Query.or(curCategories.map(c => Query.contains("categories", c))),
+            Query.notEqual("$id", packageID),
+            Query.equal("active", true),
+            Query.limit(20),
+          ])
+        : Promise.resolve({ documents: [] }),
+      tagList.length
+        ? databases.listDocuments(DBID, COLLECTIONS.PACKAGES, [
+            Query.or(tagList.map(t => Query.contains("tags", t))),
+            Query.notEqual("$id", packageID),
+            Query.equal("active", true),
+            Query.limit(20),
+          ])
+        : Promise.resolve({ documents: [] }),
     ]);
-    priceResp.documents.forEach((d) => {
-      const id = d.$id;
-      const score = (candidates.get(id)?.score || 0) + 5;
-      candidates.set(id, { score, pkg: d });
+
+    catResp.documents.forEach(d => {
+      candidates.set(d.$id, { score: (candidates.get(d.$id)?.score || 0) + 50, pkg: d });
+    });
+    tagResp.documents.forEach(d => {
+      candidates.set(d.$id, { score: (candidates.get(d.$id)?.score || 0) + 30, pkg: d });
     });
 
     const sorted = Array.from(candidates.values())
-      .filter((o) => o.pkg)
+      .filter(o => o.pkg)
       .sort((a, b) => b.score - a.score)
       .slice(0, limit);
 
-    const result = sorted.map((o) => ({
-      ...sanitizeGeneric(o.pkg), // <-- SANITIZE
-      relevance_score: o.score,
-    }));
-
     data.status = "success";
-    data.packages = result;
+    data.packages = sorted.map(o => ({ ...sanitizeGeneric(o.pkg), relevance_score: o.score }));
   } catch (error) {
     data.status = "error";
     data.message = error.message;
@@ -803,48 +793,46 @@ async function searchPackages(payload = {}) {
       resp.documents.forEach(d => packageIds.add(d.$id));
     }
 
-    // ── 5. Search ITINERARY: fetch all docs, filter in-memory
-    // Avoids schema errors by not using nested field queries
-    const itineraryResp = await databases.listDocuments(DBID, COLLECTIONS.ITINERARY, [
-      Query.limit(100) // Safe: max 30 packages → ~30 itineraries
-    ]);
+    // ── 5. Search ITINERARY only as a fallback when name/tag search found nothing
+    // Avoids a full table scan on every search query
+    if (packageIds.size === 0) {
+      const itineraryResp = await databases.listDocuments(DBID, COLLECTIONS.ITINERARY, [
+        Query.limit(100)
+      ]);
 
-    const searchLower = terms.map(t => t.toLowerCase());
+      const searchLower = terms.map(t => t.toLowerCase());
 
-    for (const doc of itineraryResp.documents) {
-      if (!doc.package_id) continue;
+      for (const doc of itineraryResp.documents) {
+        if (!doc.package_id) continue;
 
-      let matched = false;
+        let matched = false;
 
-      // Parse days once
-      const days = (doc.days || []).map(d => JSON.parse(d));
-
-      // Search: metadata names
-      const metadata = [
-        ...(doc.location_metadata || []),
-        ...(doc.activity_metadata || []),
-        ...(doc.accommodation_metadata || [])
-      ];
-      for (const meta of metadata) {
-        if (meta.name && searchLower.some(term => meta.name.toLowerCase().includes(term))) {
-          matched = true;
-          break;
-        }
-      }
-
-      // Search: day title/description
-      if (!matched) {
-        for (const day of days) {
-          const text = `${day.title || ''} ${day.description || ''}`.toLowerCase();
-          if (searchLower.some(term => text.includes(term))) {
+        // Search: metadata names (location, activity, accommodation)
+        const metadata = [
+          ...(doc.location_metadata || []),
+          ...(doc.activity_metadata || []),
+          ...(doc.accommodation_metadata || [])
+        ];
+        for (const meta of metadata) {
+          if (meta.name && searchLower.some(term => meta.name.toLowerCase().includes(term))) {
             matched = true;
             break;
           }
         }
-      }
 
-      if (matched) {
-        packageIds.add(doc.package_id);
+        // Search: day title/description
+        if (!matched) {
+          const days = (doc.days || []).map(d => JSON.parse(d));
+          for (const day of days) {
+            const text = `${day.title || ''} ${day.description || ''}`.toLowerCase();
+            if (searchLower.some(term => text.includes(term))) {
+              matched = true;
+              break;
+            }
+          }
+        }
+
+        if (matched) packageIds.add(doc.package_id);
       }
     }
 
@@ -1033,6 +1021,10 @@ async function createItem({ collection_id, db_id, item_data }) {
 
 
 export async function fetchDestinationsWithPackagesByRegion(payload) {
+  const cacheKey = 'regions:destinations-with-packages';
+  const cached = _scGet(cacheKey);
+  if (cached) return cached;
+
   const result = [];
 
   try {
@@ -1108,7 +1100,9 @@ export async function fetchDestinationsWithPackagesByRegion(payload) {
       });
     }
 
-    return { status: "success", data: result, message: "" };
+    const successResult = { status: "success", data: result, message: "" };
+    _scSet(cacheKey, successResult, 60 * 60 * 1000); // 1 hour
+    return successResult;
   } catch (err) {
     console.error("[fetchDestinationsWithPackagesByRegion] error:", err);
     return {
@@ -1182,7 +1176,7 @@ async function fetchPackageComplete({ url, category = [] }) {
       fetchExclusions({ pid: packageID }),
       fetchPackageComponent({ pid: packageID, type: 'info' }),
       fetchExpenses({ pid: packageID }),
-      fetchRelatedPackages({ packageID, category, limit: 3 })
+      fetchRelatedPackages({ packageID, packageDoc: packageDetail.document, category, limit: 3 })
     ]);
 
     return {

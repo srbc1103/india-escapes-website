@@ -90,9 +90,8 @@ export function Select(props){
             <select className={cn(`input_box capitalize`, input_styles)} {...props} autoComplete="off">
                 <option value="">{`${placeholder || `Select ${label}`}`}</option>
                 {options.map(o=>{
-                    let {id,name} = o 
-                    const is_selected = (value && value == id) || false
-                    return (<option value={id} key={id} className="capitalize" selected={is_selected}>{name}</option>)
+                    let {id,name} = o
+                    return (<option value={id} key={id} className="capitalize">{name}</option>)
                 })}
             </select>
         </div>
@@ -849,11 +848,12 @@ export function DateRangePicker(props) {
                 <select
                   className="input_box"
                   placeholder="Select Range"
+                  value={preset ?? ''}
                   onChange={(e) => handleRangePresetChange(parseInt(e.target.value))}
                 >
                   <option value="">Select Duration</option>
                   {range_presets.map((r, i) => (
-                    <option key={i} value={r.value} selected={preset === r.value}>
+                    <option key={i} value={r.value}>
                       {r.name}
                     </option>
                   ))}
