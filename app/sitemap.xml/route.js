@@ -27,7 +27,7 @@ export async function GET() {
       listAll(COLLECTIONS.BLOGS,        [Query.equal('active', true)]),
     ]);
 
-    const packages     = pkgDocs.map(p  => ({ url: `${SITE_URL}/packages/${p.url}`,     lastmod: p.$updatedAt, changefreq: 'weekly',  priority: 0.8 }));
+    const packages     = pkgDocs.map(p  => ({ url: `${SITE_URL}/${p.url}`,     lastmod: p.$updatedAt, changefreq: 'weekly',  priority: 0.8 }));
     const categories   = catDocs.map(c  => ({ url: `${SITE_URL}/categories/${c.url}`,   lastmod: c.$updatedAt, changefreq: 'weekly',  priority: 0.7 }));
     const destinations = destDocs.map(d => ({ url: `${SITE_URL}/destinations/${d.url}`, lastmod: d.$updatedAt, changefreq: 'monthly', priority: 0.7 }));
     const blogs        = blogDocs.map(b => ({ url: `${SITE_URL}/blogs/${b.url}`,         lastmod: b.$updatedAt, changefreq: 'weekly',  priority: 0.6 }));
