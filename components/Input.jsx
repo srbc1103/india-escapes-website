@@ -1140,7 +1140,7 @@ export const TextEditor = (props)=>{
     <div className="input_grp">
       <label className="text-xs ml-1 block mb-1">{label}</label>
       <Editor
-        apiKey='lmy0e5m2hf1qnxlwady9wl7q6w56u9z87uswuma1rmdgfh9o'
+        apiKey='d5wq8qbk9mg38kd7hzxe021m9zr22lc4lwxnwxycd2etuhpd'
         init={{
           plugins: [
             'anchor', 'autolink', 'charmap', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount'
