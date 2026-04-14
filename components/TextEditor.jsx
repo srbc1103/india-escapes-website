@@ -19,7 +19,7 @@ export default function TextEditor(props){
 
   return (
     <Editor
-      apiKey='64jruy956r2oe8blybughxotvaav28ye9g0pw3xu1a3f88aw'
+      apiKey='d5wq8qbk9mg38kd7hzxe021m9zr22lc4lwxnwxycd2etuhpd'
       onInit={(evt, editor) => {
         editorRef.current = editor
         // Ensure TinyMCE UI renders in body when in modal
