@@ -125,7 +125,7 @@ function DestinationPageContent() {
                 location_metadata.push(obj)
             }
         })
-        Data.update_item({ collection_id: COLLECTIONS.DESTINATIONS, document_id: did, item_data: { ...state,location_metadata: JSON.stringify(location_metadata),url } }).then(d => {
+        Data.update_item({ collection_id: COLLECTIONS.DESTINATIONS, document_id: did, item_data: { ...state,location_metadata,url } }).then(d => {
             const { status, message } = d
             if (status == 'success') {
                 toast.success('Destination details updated successfully.')
