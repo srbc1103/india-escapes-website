@@ -390,8 +390,8 @@ export default function PackageClient({ packageID }) {
                   <div className="package_ec_css text-sm lg:text-base text-gray-700" dangerouslySetInnerHTML={{ __html: state.description }} />
                   {state.highlights ? <><h2 className="text-xl font-medium lg:text-3xl mb-3 mt-6">Highlights</h2>
                     {state.highlights.length > 0 ? state.highlights.map((highlight, index) => (
-                        <div key={index} className="flex items-center gap-2 flex-1 mb-2">
-                          <div className={`w-9 h-9 rounded-full flex-center-jc bg-green/10`}>
+                        <div key={index} className="flex items-center justify-start gap-2 flex-1 mb-2">
+                          <div className={`w-9 h-9 rounded-full aspect-square flex-center-jc bg-green/10`}>
                             <Star className={`w-4 h-4 text-green`} />
                           </div>
                           <p className="text-sm lg:text-base text-gray-700">{highlight}</p>
