@@ -299,13 +299,13 @@ function DESTINATIONS() {
                         <Popover>
                           <PopoverTrigger className="square_btn h-8 w-8 mx-auto"><MoreHorizontal size={18} /></PopoverTrigger>
                           <PopoverContent className="bg-white text-sm w-[150px] -mt-2 absolute -right-4 p-0 rounded-xl shadow-lg border-none overflow-hidden" style={{ zIndex: 100 }}>
-                            <button
+                            {/* <button
                               className="p-2 flex gap-2 items-center justify-start disabled:pointer-events-none disabled:opacity-60 border-b border-gray-200/50 transition duration-300 hover:bg-green/5 w-full"
                               onClick={() => openEditForm(item)}
                               disabled={updating}
                             >
                               <div className="aspect-square rounded-full flex-center-jc bg-green/5 h-8"><Pencil size={15} className='text-green' /></div>Edit
-                            </button>
+                            </button> */}
                             <button
                               className="p-2 flex gap-2 items-center justify-start disabled:pointer-events-none disabled:opacity-60 text-red-500 transition duration-300 hover:bg-red-500/5 w-full"
                               onClick={() => handleDelete(item.id)}
