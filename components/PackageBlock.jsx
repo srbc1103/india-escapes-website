@@ -44,15 +44,18 @@ export default function PackageBlock(props){
       <div className="relative rounded-2xl package_block">
         <div className="absolute top-4 left-4 flex items-center justify-start gap-1 flex-wrap z-10">
           {tags_list && tags_list.map((tag,i)=>{
-            return <Link key={i} href={`/tag/${tag.replaceAll(' ','-').toLowerCase()}`} className="text-xs bg-black/10 border border-white rounded-full transition duration-500 hover:bg-white hover:text-black p-1 px-2 text-white backdrop-blur">{tag}</Link>
+            return (<>
+            {/* <Link key={i} href={`/tag/${tag.replaceAll(' ','-').toLowerCase()}`} className="text-xs bg-black/10 border border-white rounded-full transition duration-500 hover:bg-white hover:text-black p-1 px-2 text-white backdrop-blur">{tag}</Link> */}
+            <span key={i} className="text-xs bg-black/10 border border-white rounded-full transition duration-500 hover:bg-white hover:text-black p-1 px-2 text-white backdrop-blur">{tag}</span>
+            </>)
           })}
         </div>
-        <div className="h-88 lg:h-108 rounded-4xl overflow-hidden bg-gray-100 flex-center-jc hover:scale-[99%] transition duration-80 relative">
+        <Link href={`/${url}`} className="h-88 lg:h-108 rounded-4xl overflow-hidden bg-gray-100 flex-center-jc hover:scale-[99%] transition duration-80 relative">
           {featured_image ? <CustomImg url={featured_image} al={name} styles="cover_img"/> : <ImageIcon className='text-gray-200' size={100}/>}
           
           {/* <Image src={featured_image} alt={name} height={500} width={500} className='cover_img'/> */}
           <p className="w-fit p-1 px-2 bg-green text-white rounded-full text-sm absolute bottom-4 left-4" style={{zIndex:3}}>{duration_string}</p>
-        </div>
+        </Link>
         <Link href={`/${url}`}>
           <div className="p-4 group">
             <p className="font-medium text-xl transition duration-300 group-hover:text-red">{name}</p>
@@ -118,7 +121,8 @@ export function PackageBlock1(props){
     }
     let duration_string = ''
     if(duration){
-      duration_string =  `${duration} Day${duration > 1 ? 's' : ''}`
+      // duration_string =  `${duration} Day${duration > 1 ? 's' : ''}`
+      duration_string =  `${duration}D / ${duration-1}N`
     }
 
     return(
@@ -137,7 +141,8 @@ export function PackageBlock1(props){
           <div className="h-80 lg:h-108 rounded-4xl overflow-hidden bg-gray-100 flex-center-jc transition duration-80 relative">
             {featured_image ? <CustomImg url={featured_image} al={name} styles="cover_img"/> : <ImageIcon className='text-gray-200' size={100}/>}
             <div className="absolute bottom-0 left-0 w-full h-[80%] bg-gradient-to-t from-black/80 to-transparent p-4 lg:p-6 text-white flex flex-col items-start justify-end gap-2">
-              <p className="text-xs md:text-sm lg:text-base font-light">{duration_string}</p>
+              {/* <p className="text-xs md:text-sm lg:text-base font-light">{duration_string}</p> */}
+              <p className="w-fit p-1 px-2 bg-green text-white rounded-full text-sm" style={{zIndex:3}}>{duration_string}</p>
               <p className="text-lg md:text-xl lg:text-2xl" style={{lineHeight:'130%'}}>{name}</p>
               {(price || offer_price) ? <div className={`flex items-center justify-between w-full ${discount ? '-mt-2' : '' }`}>
                 <div className="text-xs md:text-sm lg:text-lg font-light flex items-center justify-start gap-1 relative text-gray-300">

@@ -277,6 +277,13 @@ export default function PackageClient({ packageID }) {
     }
   };
 
+  const [reviewStats,setReviewStats] = useState({
+    total_review:50456,
+    average_ratings:5,
+    trip_advisor_ratings:4,
+    in_short:'50k'
+  })
+
   useEffect(() => {
     if (packageID) loadPackage();
     else router.replace('/packages');
@@ -541,7 +548,6 @@ export default function PackageClient({ packageID }) {
 
                 {!loadingExpenses && <ExpenseSection expenses={expenses} />}
               </div>
-
               <div className="flex-1 relative">
                 {deal.active && deal.days_remaining > 0 ? (
                   <>
@@ -607,7 +613,7 @@ export default function PackageClient({ packageID }) {
                           showDialog();
                         }
                       }} disabled={loading} styles="px-4 py-2 flex-1 border border-red text-white bg-red whitespace-nowrap">
-                        {state.widget ? 'Check Availability' : "Get Quote"}
+                        {state.widget ? 'Check Availability' : "Enquire Now"}
                       </Button>
                       <ShareButton title={state.name} url={window.location.href} />
                     </div>
@@ -646,6 +652,35 @@ export default function PackageClient({ packageID }) {
               </div>
             </div>
           </div>
+          <section className="pt-8 mb-12 lg:pb-20 relative h-[80vh] md:h-auto">
+            <div className="w_80_90 relative">
+              <div className="mb-8 space-y-2">
+                <p className="text-xl lg:text-5xl font-semibold" style={{lineHeight:'120%'}}>
+                  See what <span className="text-red block">travellers are saying</span>
+                </p>
+                <p className="text-gray-700 text-sm md:text-xl">Crafting lasting memories for every traveler</p>
+                <div className="flex items-center justify-start border border-gray-300 rounded-2xl w-fit p-4 my-4 md:my-6">
+                  <div className="flex items-start justify-center flex-col pr-4 md:pr-6 border-r border-red">
+                    {/* <p className="font-medium text-2xl md:text-4xl lg:text-6xl"><span className="text-red">+</span>{reviewStats.in_short}</p>
+                    <span className="text-gray-500 text-xs md:text-sm">Customer Reviews</span> */}
+                    <Image src={IMAGES.trip_advisor_logo} height={500} width={500} alt="Trip Advisor" className="h-16 md:h-20 lg:h-24 w-auto"/>
+                  </div>
+                  <div className="flex items-start justify-center flex-col pl-4 md:pl-6">
+                    <p className="font-medium text-2xl md:text-4xl lg:text-6xl"><span className="text-red">+</span>{reviewStats.average_ratings}</p>
+                    <span className="text-gray-500 text-xs md:text-sm">Average Ratings</span>
+                  </div>
+                </div>
+                <Link
+                  href="https://www.tripadvisor.in/Attraction_Review-g304552-d32742468-Reviews-India_Escapes-Shimla_Shimla_District_Himachal_Pradesh.html"
+                  target="_blank"
+                  className=" bg-red hover:bg-black text-white py-2 px-4 rounded-full transition-all duration-500 text-xs md:text-lg"
+                >
+                  View All Reviews
+                </Link>
+              </div>
+            </div>
+            <Image src={IMAGES.review_graphic} height={1000} width={1000} alt="Review" className="absolute -bottom-4 md:bottom-0 right-0 h-1/2 md:h-[90%] w-auto md:max-w-[60%] pointer-events-none object-contain -z-10"/>
+          </section>
         </>
       )}
     </div>

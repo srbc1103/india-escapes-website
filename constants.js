@@ -27,11 +27,13 @@ import partners from './public/partners.png'
 import booking_page_bg_img from './public/booking_page_bg_img.png'
 import doc from './public/doc.png'
 import trip_advisor_logo from './public/trip_advisor_logo.png'
+import og_image from './public/og_image.png'
 import review_graphic from './public/review_graphic.webp'
+
 import { Bath, BedDouble, Binoculars, Bus, Car, CircleX, DoorOpen, HandPlatter, Info, MapPinHouse, MapPinned, PlaneTakeoff, ShieldHalf, ShoppingCart, Ticket, User, Wine } from "lucide-react";
 
 export const IMAGES = {
-  logo, logo_white, hero_bg, footer_bg, about_page_img, about_page_top_img, placeholder, call, packages_page_top_img, partners, booking_page_bg_img, icon, tts_bg, white_strip, hptdc, get_your_guide, trip_advisor, we_travel, tour_radar, viator, nidhi, travel_for_life, ministry_of_tourism, doc, review_graphic, trip_advisor_logo
+  logo, logo_white, hero_bg, footer_bg, about_page_img, about_page_top_img, placeholder, call, packages_page_top_img, partners, booking_page_bg_img, icon, tts_bg, white_strip, hptdc, get_your_guide, trip_advisor, we_travel, tour_radar, viator, nidhi, travel_for_life, ministry_of_tourism, doc, review_graphic, trip_advisor_logo, og_image
 }
 
 export const REGIONS = [
