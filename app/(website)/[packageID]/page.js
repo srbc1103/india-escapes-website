@@ -17,7 +17,7 @@ export async function generateMetadata({ params }) {
 
       let pageTitle = name;
       let pageDescription = description?.replace(/<[^>]*>/g, '').slice(0, 160) || `${name} - Explore this amazing tour package with India Escapes.`;
-      let ogImage = featured_image || IMAGES.hero_bg;
+      let ogImage = featured_image || IMAGES.og_image;
 
       // Parse custom meta description if available
       if (meta_description) {

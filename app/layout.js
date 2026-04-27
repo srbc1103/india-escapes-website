@@ -18,6 +18,20 @@ const poppins = Poppins({
 export const metadata = {
   title: "Exotic India Travel Packages & Tailor-Made Tours | India Escapes",
   description: "Discover exotic India escapes with tailor-made travel packages designed by local experts. Personalized itineraries, authentic experiences & seamless journeys. Get your free quote today!",
+  openGraph: {
+    title: "Exotic India Travel Packages & Tailor-Made Tours | India Escapes",
+    description: "Discover exotic India escapes with tailor-made travel packages designed by local experts. Personalized itineraries, authentic experiences & seamless journeys. Get your free quote today!",
+    url: "https://indiaescapes.com",
+    siteName: "India Escapes",
+    images: [{ url: "https://indiaescapes.com/og_image.png", width: 1200, height: 630, alt: "India Escapes" }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Exotic India Travel Packages & Tailor-Made Tours | India Escapes",
+    description: "Discover exotic India escapes with tailor-made travel packages designed by local experts. Personalized itineraries, authentic experiences & seamless journeys. Get your free quote today!",
+    images: ["https://indiaescapes.com/og_image.png"],
+  },
 };
 
 export default function RootLayout({ children }) {

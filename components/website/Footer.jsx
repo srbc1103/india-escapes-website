@@ -217,14 +217,14 @@ export function NeedHelp(){
                     animate={{opacity:1,marginRight:0}}
                     // transition={{duration:0.5}}
                     exit={{opacity:0,marginRight:-100}}
-                    className="fixed top-2/3 md:top-[65%] -right-10 md:right-0 z-20 flex-center-jc flex-col gap-2 bg-white rounded-tr-2xl rounded-tl-2xl md:rounded-l-2xl md:rounded-r-none transition duration-300 cursor-pointer shadow-xl p-4 lg:p-2 py-2 border-2 border-gray-100 border-r-transparent hover:shadow-2xl -rotate-90 md:rotate-0" onClick={()=>{
+                    className="fixed top-2/3 md:top-[65%] -right-10 md:right-0 z-20 flex-center-jc flex-col gap-2 bg-green rounded-tr-2xl rounded-tl-2xl md:rounded-l-2xl md:rounded-r-none transition duration-300 cursor-pointer shadow-xl p-4 lg:p-2 py-2 border-2 border-gray-100 border-r-transparent hover:shadow-2xl -rotate-90 md:rotate-0" onClick={()=>{
                         setOpened(true)
                     }}
                 >
-                    <div className=" shadow-xl overflow-hidden aspect-square rounded-full border-2 border-white h-8 hidden md:flex md:items-center md:justify-center">
+                    <div className=" shadow-xl overflow-hidden aspect-square rounded-full border-2 border-white/40 h-8 hidden md:flex md:items-center md:justify-center">
                         <Image src={IMAGES.call} height={200} width={200} alt="" className="cover_img"/>
                     </div>
-                    <p className="font-medium text-sm lg:text-xs text-gray-700">Need help?</p>
+                    <p className="font-medium text-sm lg:text-xs text-white">Need help?</p>
                 </motion.div>
             </>}
         </>

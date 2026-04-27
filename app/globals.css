@@ -348,3 +348,13 @@ button{cursor: pointer;}
 .tox .tox-toolbar__overflow {
   z-index: 100001 !important;
 }
+
+/* Suppress Google Translate toolbar — applied before JS so there is never a flash */
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate { display: none !important; }
+.goog-te-gadget { display: none !important; }
+#goog-gt-tt,
+.goog-te-balloon-frame,
+.goog-tooltip,
+.goog-tooltip-content { display: none !important; }
+body { top: 0px !important; }
