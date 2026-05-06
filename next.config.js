@@ -1,6 +1,6 @@
 module.exports = {
     images: {
-      domains: ['nyc.cloud.appwrite.io','fra.cloud.appwrite.io']
+      domains: ['nyc.cloud.appwrite.io','fra.cloud.appwrite.io','187.127.159.200']
     },
   };
   

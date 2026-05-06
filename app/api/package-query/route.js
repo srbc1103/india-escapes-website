@@ -224,11 +224,7 @@ async function fetchPackages(payload = {}) {
       if (featured) finalQueries.push(Query.equal("featured", true));
 
       // Add ID filter
-      if (batch.length === 1) {
-        finalQueries.push(Query.equal("$id", batch[0]));
-      } else {
-        finalQueries.push(Query.or(batch.map(id => Query.equal("$id", id))));
-      }
+      finalQueries.push(Query.equal("$id", batch));
 
       const resp = await databases.listDocuments(
         DBID,
@@ -297,7 +293,7 @@ async function fetchPackagesForDeals(deals = []) {
       batches.map(async (batch) => {
         const queries = [
           Query.equal("active", true),
-          Query.or(batch.map(id => Query.equal("$id", id))),
+          Query.equal("$id", batch),
           Query.orderDesc("$createdAt")
         ];
 
@@ -408,7 +404,7 @@ async function fetchPackagesForLabels(labels = []) {
       batches.map(async (batch) => {
         const queries = [
           Query.equal("active", true),
-          Query.or(batch.map(id => Query.equal("$id", id))),
+          Query.equal("$id", batch),
           Query.orderDesc("$createdAt")
         ];
 
@@ -868,11 +864,7 @@ async function searchPackages(payload = {}) {
       ];
       if (featured) finalQueries.push(Query.equal("featured", true));
 
-      if (batch.length === 1) {
-        finalQueries.push(Query.equal("$id", batch[0]));
-      } else {
-        finalQueries.push(Query.or(batch.map(id => Query.equal("$id", id))));
-      }
+      finalQueries.push(Query.equal("$id", batch));
 
       const resp = await databases.listDocuments(
         DBID,
