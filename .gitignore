@@ -44,3 +44,7 @@ next-env.d.ts
 # Environment variables
 .env.local
 .env*.local
+migrate.mjs
+migration.log
+patch_urls.mjs
+patch_urls.log
